@@ -12,5 +12,5 @@ func main() {
 	server := server.Initialise()
 
 	fmt.Print("Serving")
-	log.Fatal(server.S.ListenAndServe())
+	log.Fatal(server.ListenAndServe())
 }

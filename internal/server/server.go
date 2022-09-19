@@ -7,19 +7,20 @@ import (
 	"github.com/williambilsdon/authentication-go/internal/authuser"
 )
 
-type Server struct {
-	S *http.Server
-}
+func Initialise() *http.Server {
+	r := handlers()
 
-func Initialise() *Server {
-	r := mux.NewRouter()
-	r.HandleFunc("/login", authuser.LoginHandler)
-	server := Server{
-		S: &http.Server{
-			Addr:    ":8080",
-			Handler: r,
-		},
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
 	}
 
-	return &server
+	return server
+}
+
+func handlers() *mux.Router {
+	r := mux.NewRouter()
+	r.HandleFunc("/login", authuser.LoginHandler)
+
+	return r
 }
