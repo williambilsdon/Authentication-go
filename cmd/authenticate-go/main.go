@@ -3,24 +3,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
 type Login struct {
-	username string
-	password string
+	Username string
+	Password string
 }
 
 func loginHandler(w http.ResponseWriter, req *http.Request) {
 	var loginBody Login
 	err := json.NewDecoder(req.Body).Decode(&loginBody)
 	if err != nil {
+		fmt.Print(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	fmt.Print(loginBody.password)
-
-	w.Write([]byte(loginBody.username))
+	fmt.Printf("Username: %s\nPassword: %s\n", loginBody.Username, loginBody.Password)
+	w.Write([]byte(loginBody.Username))
 }
 
 func main() {
@@ -28,5 +29,5 @@ func main() {
 	http.HandleFunc("/login", loginHandler)
 
 	fmt.Print("Serving")
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
