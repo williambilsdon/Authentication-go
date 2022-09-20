@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/williambilsdon/authentication-go/internal/server"
+	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/williambilsdon/authentication-go/internal/authapi"
 )
 
 func main() {
 
-	server := server.Initialise()
+	server := authapi.Server{}
+	server = server.NewServer()
 
 	fmt.Print("Serving")
-	log.Fatal(server.ListenAndServe())
+	server.Start()
 }

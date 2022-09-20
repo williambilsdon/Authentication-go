@@ -1,4 +1,4 @@
-package authuser
+package authapi
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ type login struct {
 	Password string
 }
 
-func LoginHandler(w http.ResponseWriter, req *http.Request) {
+func (s *Server) LoginHandler(w http.ResponseWriter, req *http.Request) {
 	var loginBody login
 	err := json.NewDecoder(req.Body).Decode(&loginBody)
 	if err != nil {
