@@ -7,8 +7,8 @@ import (
 )
 
 type AuthRepo interface {
-	CreateUser(params models.User) error
-	Login(params models.UserLogin) *sql.Row
+	CreateUser(params models.User, password []byte) error
+	Login(username string) *sql.Row
 }
 
 type authRepo struct {
@@ -19,12 +19,12 @@ func NewAuthRepo(db *sql.DB) *authRepo {
 	return &authRepo{db}
 }
 
-func (r *authRepo) CreateUser(params models.User) error {
-	_, err := r.db.Query("INSERT INTO users (Username, Firstname, Lastname, Password) VALUES (?, ?, ?, ?)", params.Username, params.Firstname, params.Lastname, params.Password)
+func (r *authRepo) CreateUser(params models.User, password []byte) error {
+	_, err := r.db.Query("INSERT INTO users (Username, Firstname, Lastname, Password) VALUES (?, ?, ?, ?)", params.Username, params.Firstname, params.Lastname, password)
 	return err
 }
 
-func (r *authRepo) Login(params models.UserLogin) *sql.Row {
-	result := r.db.QueryRow("SELECT Username FROM users WHERE Username = ? AND Password = ?", params.Username, params.Password)
+func (r *authRepo) Login(username string) *sql.Row {
+	result := r.db.QueryRow("SELECT Password FROM users WHERE Username = ?", username)
 	return result
 }
