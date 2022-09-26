@@ -1,14 +1,30 @@
 package authapi
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
+var signingKey = []byte("secert-string")
+
 type Claims struct {
 	Username string
 	jwt.StandardClaims
+}
+
+func verifyJwt(tokenString string) error {
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		return signingKey, nil
+	})
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		fmt.Printf("claims %s", claims)
+	} else {
+		return err
+	}
+
+	return nil
 }
 
 func newJwt(username string) (string, error) {
@@ -21,8 +37,8 @@ func newJwt(username string) (string, error) {
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodPS256, claims)
-	tokenString, err := token.SignedString([]byte("secret-string"))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(signingKey)
 	if err != nil {
 		return "", err
 	}

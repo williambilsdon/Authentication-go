@@ -10,7 +10,7 @@ import (
 )
 
 type AuthService interface {
-	CreateUser(user models.User) error
+	CreateUser(user models.User) (string, error)
 	Login(userLogin models.UserLogin) (string, error)
 }
 
@@ -24,15 +24,23 @@ func NewAuthService(repo repo.AuthRepo) *authService {
 	}
 }
 
-func (s *authService) CreateUser(user models.User) error {
+func (s *authService) CreateUser(user models.User) (string, error) {
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 4)
 	if err != nil {
-		return errors.New("failed to encrypt password")
+		return "", errors.New("failed to encrypt password")
 	}
 
 	err = s.r.CreateUser(user, encryptedPassword)
+	if err != nil {
+		return "", err
+	}
 
-	return err
+	token, err := newJwt(user.Username)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 func (s *authService) Login(userLogin models.UserLogin) (string, error) {
