@@ -11,7 +11,7 @@ import (
 
 type AuthService interface {
 	CreateUser(user models.User) error
-	Login(userLogin models.UserLogin) error
+	Login(userLogin models.UserLogin) (string, error)
 }
 
 type authService struct {
@@ -35,18 +35,23 @@ func (s *authService) CreateUser(user models.User) error {
 	return err
 }
 
-func (s *authService) Login(userLogin models.UserLogin) error {
+func (s *authService) Login(userLogin models.UserLogin) (string, error) {
 	result := s.r.Login(userLogin.Username)
 	var resultBytes []byte
 	err := result.Scan(&resultBytes)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = bcrypt.CompareHashAndPassword(resultBytes, []byte(userLogin.Password))
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	token, err := newJwt(userLogin.Username)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

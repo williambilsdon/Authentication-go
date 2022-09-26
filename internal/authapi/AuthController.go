@@ -51,12 +51,12 @@ func (c *authController) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = c.s.Login(userLogin)
+	token, err := c.s.Login(userLogin)
 	if err != nil {
 		log.Printf(err.Error())
 		http.Error(w, "Login Failed", http.StatusBadRequest)
 		return
 	}
-
+	w.Write([]byte(token))
 	w.Write([]byte("Login successful."))
 }
