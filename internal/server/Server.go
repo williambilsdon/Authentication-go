@@ -32,7 +32,7 @@ func (s *Server) createHandler() *http.ServeMux {
 
 	mux.HandleFunc("/login", s.auth.Login)
 	mux.HandleFunc("/register", s.auth.CreateUser)
-	mux.HandleFunc("/dosomething", s.auth.DoSomething)
+	mux.HandleFunc("/refreshsession", s.auth.RefreshJwt)
 
 	return mux
 }

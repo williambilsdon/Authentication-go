@@ -10,7 +10,7 @@ import (
 var signingKey = []byte("secert-string")
 
 type Claims struct {
-	Username string
+	Username string `json:string`
 	jwt.StandardClaims
 }
 
@@ -44,4 +44,21 @@ func newJwt(username string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func refreshJwt(tokenString string) (string, error) {
+	var claims Claims
+	_, err := jwt.ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface{}, error) {
+		return signingKey, nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	newToken, err := newJwt(claims.Username)
+	if err != nil {
+		return "", err
+	}
+
+	return newToken, nil
 }

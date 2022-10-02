@@ -2,6 +2,7 @@ package authapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 type AuthController interface {
 	CreateUser(w http.ResponseWriter, req *http.Request)
 	Login(w http.ResponseWriter, req *http.Request)
-	DoSomething(w http.ResponseWriter, req *http.Request)
+	RefreshJwt(w http.ResponseWriter, req *http.Request)
 }
 
 type authController struct {
@@ -66,15 +67,20 @@ func (c *authController) Login(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func (c *authController) DoSomething(w http.ResponseWriter, req *http.Request) {
+func (c *authController) RefreshJwt(w http.ResponseWriter, req *http.Request) {
 	authHeader := req.Header.Get("Authorization")
 
 	err := verifyJwt(authHeader)
 	if err != nil {
 		log.Printf(err.Error())
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		finalErr := fmt.Sprintf("%s. JWT has expired please log in.", err.Error())
+		http.Error(w, finalErr, http.StatusUnauthorized)
 		return
 	}
 
-	w.Write([]byte("JWT Verified!"))
+	token, err := c.s.RefreshJwt(authHeader)
+
+	resp := models.LoginResp{Token: token}
+
+	json.NewEncoder(w).Encode(resp)
 }

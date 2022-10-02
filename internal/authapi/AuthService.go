@@ -12,6 +12,7 @@ import (
 type AuthService interface {
 	CreateUser(user models.User) (string, error)
 	Login(userLogin models.UserLogin) (string, error)
+	RefreshJwt(token string) (string, error)
 }
 
 type authService struct {
@@ -57,6 +58,16 @@ func (s *authService) Login(userLogin models.UserLogin) (string, error) {
 	}
 
 	token, err := newJwt(userLogin.Username)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func (s *authService) RefreshJwt(token string) (string, error) {
+
+	token, err := refreshJwt(token)
 	if err != nil {
 		return "", err
 	}
