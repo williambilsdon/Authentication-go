@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/williambilsdon/authentication-go/internal/jwt"
 	"github.com/williambilsdon/authentication-go/internal/models"
 )
 
@@ -70,7 +71,7 @@ func (c *authController) Login(w http.ResponseWriter, req *http.Request) {
 func (c *authController) RefreshJwt(w http.ResponseWriter, req *http.Request) {
 	authHeader := req.Header.Get("Authorization")
 
-	err := verifyJwt(authHeader)
+	err := jwt.VerifyJwt(authHeader)
 	if err != nil {
 		log.Printf(err.Error())
 		finalErr := fmt.Sprintf("%s. JWT has expired please log in.", err.Error())

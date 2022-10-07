@@ -1,4 +1,4 @@
-package authapi
+package jwt
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func verifyJwt(tokenString string) error {
+func VerifyJwt(tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return signingKey, nil
 	})
@@ -27,7 +27,7 @@ func verifyJwt(tokenString string) error {
 	return nil
 }
 
-func newJwt(username string) (string, error) {
+func NewJwt(username string) (string, error) {
 	expirationTime := time.Now().Add(12 * time.Hour)
 
 	claims := Claims{
@@ -46,7 +46,7 @@ func newJwt(username string) (string, error) {
 	return tokenString, nil
 }
 
-func refreshJwt(tokenString string) (string, error) {
+func RefreshJwt(tokenString string) (string, error) {
 	var claims Claims
 	_, err := jwt.ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface{}, error) {
 		return signingKey, nil
@@ -55,7 +55,7 @@ func refreshJwt(tokenString string) (string, error) {
 		return "", err
 	}
 
-	newToken, err := newJwt(claims.Username)
+	newToken, err := NewJwt(claims.Username)
 	if err != nil {
 		return "", err
 	}

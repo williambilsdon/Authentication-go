@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/williambilsdon/authentication-go/internal/jwt"
 	"github.com/williambilsdon/authentication-go/internal/models"
 	repo "github.com/williambilsdon/authentication-go/internal/repository"
 )
@@ -36,7 +37,7 @@ func (s *authService) CreateUser(user models.User) (string, error) {
 		return "", err
 	}
 
-	token, err := newJwt(user.Username)
+	token, err := jwt.NewJwt(user.Username)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +58,7 @@ func (s *authService) Login(userLogin models.UserLogin) (string, error) {
 		return "", err
 	}
 
-	token, err := newJwt(userLogin.Username)
+	token, err := jwt.NewJwt(userLogin.Username)
 	if err != nil {
 		return "", err
 	}
@@ -67,7 +68,7 @@ func (s *authService) Login(userLogin models.UserLogin) (string, error) {
 
 func (s *authService) RefreshJwt(token string) (string, error) {
 
-	token, err := refreshJwt(token)
+	token, err := jwt.RefreshJwt(token)
 	if err != nil {
 		return "", err
 	}
